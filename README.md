@@ -1,156 +1,84 @@
-# Shopping Cart Analysis
+# 📦 Case Study: Phân tích giỏ hàng với Apriori
 
-Phân tích dữ liệu bán lẻ để tìm ra mối quan hệ giữa các sản phẩm thường được mua cùng nhau bằng các kỹ thuật **Association Rule Mining** (Apriori). Project triển khai pipeline đầy đủ từ xử lý dữ liệu → phân tích → khai thác luật → sinh báo cáo.
+## 👥 Thông tin Nhóm
+- **Nhóm:** 
+- **Thành viên:** 
+  - 1671040025 Nguyễn Trung Thành
+  - 1771040010 Nguyễn Văn Hải
+  - 1771040011 Bế Quang Hải
+- **Chủ đề:** 3
+- **Dataset:** Online Retail (UCI)
 
----
+## Mục tiêu 
+Mục tiêu
+Ưu tiên các luật có mối quan hệ thực sự khác ngẫu nhiên
+Loại bỏ các luật “trông có vẻ tốt” nhưng thực chất chỉ phản ánh độ phổ biến
 
-## Features
+## 1. Ý tưởng & Feynman Style
+Giải thích lại bài toán theo cách **dễ hiểu nhất** (không technical):
+- Apriori giúp chúng ta tìm ra những sản phẩm thường được mua cùng nhau trong một cửa hàng.
+- Vì dữ liệu giỏ hàng rất đơn giản nhưng rất nhiều:
+  - Mỗi hóa đơn chỉ là một danh sách sản phẩm
+  - Nhưng số lượng hóa đơn thì lớn
+- Ý tưởng thuật toán
+  - Nếu một nhóm sản phẩm ít khi xuất hiện, thì mọi nhóm lớn hơn chứa nó cũng sẽ ít xuất hiện.
 
-- Làm sạch dữ liệu & xử lý giá trị lỗi
-- Xây dựng basket matrix (transaction × product)
-- Khai phá tập mục phổ biến (Frequent itemsets)
-- Sinh luật kết hợp (Association Rules)
-- Các chỉ số:
-  - Support
-  - Confidence
-  - Lift
-- Visualization với:
-  - bar chart
-  - scatter plot
-  - network graph
-  - interactive Plotly
-- Tự động hóa pipeline bằng **Papermill**
+## 2. Quy trình Thực hiện
 
----
+1) Load & làm sạch dữ liệu  
+2) Tạo ma trận basket  
+3) Áp dụng Apriori  
+4) Trích xuất luật  
+5) Trực quan hóa  
+6) Phân tích insight  
 
-## Project Structure
+## 3. Tiền xử lý Dữ liệu
+- Những bước làm sạch:
+  - Loại bỏ sản phẩm "rỗng"
+  - Loại bỏ transaction bị cancel (InvoiceNo bắt đầu "C")
+  - Loại bỏ số lượng âm
 
-```text
-shopping_cart_analysis/
-├── data/
-│   ├── raw/
-│   │   └── online_retail.csv
-│   └── processed/
-│       ├── cleaned_uk_data.csv
-│       ├── basket_bool.parquet
-│       └── rules_apriori_filtered.csv
-│
-├── notebooks/
-│   ├── preprocessing_and_eda.ipynb
-│   ├── basket_preparation.ipynb
-│   ├── apriori_modelling.ipynb
-│   └── runs/
-│       ├── preprocessing_and_eda_run.ipynb
-│       ├── basket_preparation_run.ipynb
-│       └── apriori_modelling_run.ipynb
-│
-├── src/
-│   └── shopping_cart_library.py
-│
-├── run_papermill.py
-├── requirements.txt
-└── README.md
-```
+- Thống kê nhanh:
+  - Số giao dịch sau lọc: 485,123 giao dịch
+  - Số sản phẩm duy nhất: 541,909 giao dịch
 
----
-
-## Installation
-
-```bash
-git clone <your_repo_url>
-cd shopping_cart_analysis
-pip install -r requirements.txt
-Data Preparation
-Đặt file gốc vào:
-```
-
-```bash
-data/raw/online_retail.csv
-File output sẽ được sinh tự động vào:
-```
-
-```bash
-data/processed/
-```
-
-Run Pipeline (Recommended)
-Chạy toàn bộ phân tích chỉ với 1 lệnh:
-
-```bash
-python run_papermill.py
-```
-Kết quả sinh ra:
-
-```bash
-data/processed/cleaned_uk_data.csv
-data/processed/basket_bool.parquet
-data/processed/rules_apriori_filtered.csv
-notebooks/runs/apriori_modelling_run.ipynb
-```
-
-### Changing Parameters
-Các tham số có thể chỉnh trong run_papermill.py:
+## 4. Áp dụng Apriori
+**Tham số sử dụng:**
+- `min_support = 0.01`
+- `min_threshold = 1.0`
+- `max_len = 3`
 
 ```python
-MIN_SUPPORT=0.01
-MAX_LEN=3
-FILTER_MIN_CONF=0.3
-FILTER_MIN_LIFT=1.2
+from mlxtend.frequent_patterns import apriori, association_rules
+
+frequent_itemsets = apriori(basket_df, min_support=0.002, use_colnames=True)
+rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
+rules.sort_values("lift", ascending=False, inplace=True)
+rules.head()
 ```
 
-Hoặc sửa trong cell PARAMETERS của mỗi notebook để chạy với cấu hình khác nhau.
-
-### Visualization & Results
-Notebook 03 hiển thị các biểu đồ sau:
-
-Top luật theo Lift
-
-Top luật theo Confidence
-
-Scatter Support–Confidence–Lift
-
-Network Graph giữa các sản phẩm
-
-Biểu đồ Plotly tương tác
-
-Bạn có thể export sang HTML:
-
-```bash
-jupyter nbconvert notebooks/runs/priori_modelling_run.ipynb --to html
-```
-
-### Ứng dụng thực tế
-Product recommendation
-
-Cross-selling strategy
-
-Combo gợi ý sản phẩm
-
-Phân tích hành vi mua hàng
-
-Sắp xếp sản phẩm tại siêu thị
-
-### Tech Stack
-
-| Công nghệ | Mục đích |
-|----------|----------|
-| Python | Ngôn ngữ chính |
-| Pandas | Xử lý dữ liệu transaction |
-| MLxtend | Apriori / FP-Growth association rules |
-| Papermill | Chạy pipeline notebook tự động |
-| Matplotlib & Seaborn | Visualization biểu đồ tĩnh |
-| Plotly | Dashboard / biểu đồ tương tác |
-| Jupyter Notebook | Môi trường notebook |
-
-### Roadmap
- Thêm FP-Growth notebook (04)
-
- Streamlit dashboard để lọc luật
+## 5. Trực quan hóa (Visualization)
+![alt text](image.png)
+- Hình 1: caption mô tả…
+- Hình 2: caption mô tả…
 
 
-### Author
-Project thực hiện bởi:
-Trang Le
+## 6. Insight từ Kết quả
+**Insight #1:**  
+**Insight #2:**  
+**Insight #3:**  
+**Insight #4:**  
+**Insight #5:**  
 
-📄 License
-MIT — sử dụng tự do cho nghiên cứu, học thuật và ứng dụng nội bộ.
+## 7. Kết luận & Đề xuất Kinh doanh
+- Gợi ý cross-sell…
+- Gợi ý sắp xếp hàng trên kệ…
+- Gợi ý khuyến mãi theo mùa…
+
+
+## 8. Link Code & Notebook
+- Notebook:
+- Repo:
+
+## 9. Slide trình bày
+- Link Slide:
