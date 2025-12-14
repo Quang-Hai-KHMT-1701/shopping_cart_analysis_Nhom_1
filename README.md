@@ -38,7 +38,7 @@ Giải thích lại bài toán theo cách **dễ hiểu nhất** (không technic
   - Loại bỏ transaction bị cancel (InvoiceNo bắt đầu "C")
   - Loại bỏ số lượng âm
 
-<<<<<<< HEAD
+HEAD
 ```text
 shopping_cart_analysis/
 ├── data/
@@ -65,11 +65,10 @@ shopping_cart_analysis/
 ├── requirements.txt
 └── README.md
 ```
-=======
 - Thống kê nhanh:
   - Số giao dịch sau lọc: 485,123 giao dịch
   - Số sản phẩm duy nhất: 541,909 giao dịch
->>>>>>> origin/tuan2NguyenTrungThanh
+ origin/tuan2NguyenTrungThanh
 
 ## 4. Áp dụng Apriori
 **Tham số sử dụng:**
@@ -92,18 +91,18 @@ rules.head()
 - Hình 2: caption mô tả…
 
 
-<<<<<<< HEAD
+ HEAD
 ### Author
 Project được thực hiện bởi:
 Trang Le
-=======
+
 ## 6. Insight từ Kết quả
 **Insight #1:**  
 **Insight #2:**  
 **Insight #3:**  
 **Insight #4:**  
 **Insight #5:**  
->>>>>>> origin/tuan2NguyenTrungThanh
+ origin/tuan2NguyenTrungThanh
 
 ## 7. Kết luận & Đề xuất Kinh doanh
 - Gợi ý cross-sell…
